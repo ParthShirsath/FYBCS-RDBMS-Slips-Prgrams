@@ -1,0 +1,186 @@
+create table project(pno int primary key,
+pname varchar(20),
+ptype varchar(20),
+duration int);
+
+create table Employee(eno int primary key,
+ename char(20),
+salary float,
+joining_date date);
+
+create table ep(pno int references project,eno int references employee,start_date date);
+
+insert into project values(1,'Robotics','Industrial',40);
+insert into project values(2,'Computer','System',20);
+insert into project values(3,'Electronics','Industrial',30);
+
+insert into Employee values(101,'om',20000,'2022-2-13');
+insert into Employee values(102,'sai',30000,'2020-7-23');
+insert into Employee values(103,'ram',25000,'2018-3-3');
+insert into Employee values(104,'sham',50000,'2017-8-13');
+
+
+insert into ep values(1,101,'2012-2-7');
+insert into ep values(1,102,'2022-6-14');
+insert into ep values(2,103,'2012-5-24');
+insert into ep values(2,104,'2016-11-5');
+insert into ep values(2,103,'2013-12-9');
+insert into ep values(3,101,'2019-8-9');
+insert into ep values(3,101,'2020-7-18');
+insert into ep values(3,104,'2021-2-17');
+
+
+create or replace function disp_emp(pname1 varchar) returns int 
+AS
+$$
+DECLARE
+cnt int;
+BEGIN
+select count(*) into cnt from project,employee,ep where project.pno=ep.pno
+and employee.eno=ep.eno
+and pname=pname1;
+return cnt;
+END;
+$$
+LANGUAGE PLPGSQL;
+--calling--
+select disp_emp('Robotics');
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+create or replace function disp_project(dur int) returns void 
+AS
+$$
+DECLARE
+c1 cursor for select * from project where duration>dur;
+r1 project%rowtype;
+BEGIN
+open c1;
+loop
+fetch c1 into r1;
+exit when not found;
+raise notice'Project Number=%',r1.pno;
+raise notice'Project Name=%',r1.pname;
+raise notice'Project Type=%',r1.ptype;
+raise notice'Project Duration=%',r1.duration;
+end loop;
+close c1;
+END;
+$$
+LANGUAGE PLPGSQL;
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+create or replace function disp_project(name varchar) returns void 
+AS
+$$
+DECLARE
+c1 cursor for select pname from project,employee,ep where 
+project.pno=ep.pno and
+employee.eno=ep.eno and
+ename=name;
+name1 varchar(20);
+BEGIN
+open c1;
+loop
+fetch c1 into name1;
+exit when not found;
+raise notice'Project Name=%',name1;
+end loop;
+close c1;
+END;
+$$
+LANGUAGE PLPGSQL;
+--calling--
+select disp_project('sai');
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+create or replace function disp_emp() returns int 
+AS
+$$
+DECLARE
+cnt int;
+BEGIN
+select count(*) into cnt from employee where joining_date<'2021-7-12';
+return cnt;
+END;
+$$
+LANGUAGE PLPGSQL;
+
+select disp_emp(); 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+create or replace function disp_emp(no int) returns int 
+AS
+$$
+DECLARE
+cnt int;
+BEGIN
+select count(*) into cnt from employee,project,ep where 
+project.pno=ep.pno and
+employee.eno=ep.eno and 
+employee.eno=no;
+return cnt;
+END;
+$$
+LANGUAGE PLPGSQL;
+
+select disp_emp(101); 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+create or replace function disp_project(name varchar) returns void 
+AS
+$$
+DECLARE
+c1 cursor for select ename from project,employee,ep where 
+project.pno=ep.pno and
+employee.eno=ep.eno and
+pname=name;
+name1 varchar(20);
+BEGIN
+open c1;
+loop
+fetch c1 into name1;
+exit when not found;
+raise notice'Employee Name=%',name1;
+end loop;
+close c1;
+END;
+$$
+LANGUAGE PLPGSQL;
+--calling--
+select disp_project('Robotics');
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+create or replace function disp_project1(type varchar) returns varchar
+AS
+$$
+declare
+name varchar(20);
+begin
+select pname into name from project where ptype=type;
+return name;
+end;
+$$
+language plpgsql;
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+create or replace function disp_project(name varchar) returns void 
+AS
+$$
+DECLARE
+c1 cursor for select ename from project,employee,ep where 
+project.pno=ep.pno and
+employee.eno=ep.eno and
+pname=name;
+name1 varchar(20);
+BEGIN
+open c1;
+loop
+fetch c1 into name1;
+exit when not found;
+raise notice'Employee Name=%',name1;
+end loop;
+close c1;
+END;
+$$
+LANGUAGE PLPGSQL;
+--calling--
+select disp_project('Robotics');
+
