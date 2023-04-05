@@ -1,0 +1,80 @@
+create table item(itemno int primary key,
+item_name varchar(20));
+
+create table supplier(supplier_no int primary key,
+supplier_name varchar(20),
+city varchar(20));
+
+create table i_s(itemno int references item(itemno),
+supplier_no int references supplier(supplier_no),
+rate money,
+quantity int);
+
+insert into item values(1,'car');
+insert into item values(2,'TV');
+insert into item values(3,'FRIDGE');
+insert into item values(4,'SOFA');
+
+insert into supplier values(101,'Om','Pune');
+insert into supplier values(102,'Sai','Mumbai');
+insert into supplier values(103,'Ram','Nashik');
+insert into supplier values(104,'Sham','Pune');
+
+insert into i_s values(1,101,300000,9);
+insert into i_s values(1,102,400000,6);
+insert into i_s values(2,101,30000,8);
+insert into i_s values(2,103,35000,15);
+insert into i_s values(2,104,25000,20);
+insert into i_s values(3,102,17000,21);
+insert into i_s values(3,104,20000,12);
+insert into i_s values(4,101,40000,14);
+
+
+create or replace function disp_supp(city1 varchar) returns int as
+$$
+DECLARE
+cnt int;
+BEGIN
+select count(*) into cnt from supplier where city=city1;
+return cnt;
+END;
+$$
+LANGUAGE PLPGSQL;
+
+select disp_supp('Pune');
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+create or replace function disp_name() returns void 
+AS
+$$
+declare 
+c1 cursor for select distinct item_name from item,i_s where item.itemno=i_s.itemno
+and rate>'20000';
+name varchar(20);
+begin
+open c1;
+loop
+fetch c1 into name;
+exit when not found;
+raise notice'Item name=%',name;
+end loop;
+close c1;
+end;
+$$
+language plpgsql;
+
+select disp_name();
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+create or replace function disp_msg() returns trigger as'
+declare
+begin 
+if(new.rate<''10000'')then
+raise exception''Rate Should be greater than 10000'';
+end if;
+return new;
+end;'
+language 'plpgsql';
+
+create trigger t1
+before insert or update on i_s
+for each row
+execute procedure disp_msg();

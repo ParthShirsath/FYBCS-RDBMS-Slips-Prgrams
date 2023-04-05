@@ -1,0 +1,120 @@
+create table area(aid int primary key,
+aname varchar(20),
+a_type varchar(20) check(a_type in('rural','urban')));
+
+create table person(pno int primary key,
+pname varchar(20),
+birthdate date,
+income money,
+aid int references area(aid));
+
+
+insert into area values(1,'pune','urban');
+insert into area values(2,'mumbai','urban');
+insert into area values(3,'rahata','rural');
+
+insert into person values(101,'om','2004-3-21',20000,1);
+insert into person values(102,'sai','2005-6-1',25000,1);
+insert into person values(103,'ram','2003-7-12',40000,1);
+insert into person values(104,'sham','2014-8-14',30000,2);
+insert into person values(105,'aman','2016-1-3',45000,2);
+insert into person values(106,'aba','2007-3-20',35000,3);
+insert into person values(107,'dada','2019-5-12',50000,3);
+insert into person values(108,'rahul','2020-3-21',80000,3);
+
+
+create or replace function disp_person(month int) returns void as
+$$
+declare
+c1 cursor for select pname from person where extract(month from birthdate)=month;
+name varchar(20);
+begin
+open c1;
+loop
+fetch c1 into name;
+exit when not found;
+raise notice'Person Name=%',name;
+end loop;
+close c1;
+end;
+$$
+language plpgsql;
+--calling--
+select disp_person(3);
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+create or replace function disp_person(area1 varchar) returns int as
+$$
+declare
+cnt int;
+begin
+select count(*) into cnt from area,person where area.aid=person.aid
+and aname=area1;
+return cnt;
+end;
+$$
+language plpgsql;
+--calling--
+select disp_person('pune');
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+create or replace function update_rate() returns void as
+$$
+declare
+cnt int;
+begin
+update person set income=income+(income*0.10);
+raise notice'Record update successfully.......!';
+end;
+$$
+language plpgsql;
+--calling--
+select update_rate();
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+create or replace function disp_person() returns void as
+$$
+declare
+c1 cursor for select pname from person,area where person.aid=area.aid and a_type='urban';
+name1 varchar(20);
+begin
+open c1;
+loop
+fetch c1 into name1;
+exit when not found;
+raise notice'Person Name=%',name1;
+end loop;
+close c1;
+end;
+$$
+language plpgsql;
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+create or replace function disp_person1() returns int as
+$$
+declare
+cnt int;
+begin
+select count(*) into cnt from person where extract(month from birthdate)=6;
+return cnt;
+end;
+$$
+language plpgsql;
+--calling--
+select disp_person();
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+create or replace function disp_person1(atype1 varchar) returns void as
+$$
+declare
+c1 cursor for select count(*) from person,area where person.aid=area.aid and a_type=atype1;
+cnt int;
+begin
+open c1;
+loop
+fetch c1 into cnt;
+exit when not found;
+raise notice'% area madhe % person rahatat',atype1,cnt;
+end loop;
+close c1;
+end;
+$$
+language plpgsql;
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
