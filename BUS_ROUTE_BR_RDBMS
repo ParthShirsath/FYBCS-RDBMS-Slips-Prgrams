@@ -1,0 +1,83 @@
+create table bus(bus_no int primary key
+,capacity int
+,depo_name varchar(20)
+);
+
+create table route(route_no int primary key
+,source varchar(20)
+,destination varchar(20)
+,no_of_station int);
+
+create table BR(bus_no int references bus(bus_no),
+route_no int references route(route_no)
+);
+
+insert into bus values(1,40,'shrirampur');
+insert into bus values(2,50,'newasa');
+insert into bus values(3,55,'nagar');
+insert into bus values(4,30,'shrirampur');
+
+insert into route values(101,'shrirampur','pune',10);
+insert into route values(102,'shrirampur','rahuri',7);
+insert into route values(103,'ahillyanagar','shirdi',4);
+
+insert into BR values(1,101);
+insert into BR values(1,102);
+insert into BR values(2,101);
+insert into BR values(2,102);
+insert into BR values(2,103);
+insert into BR values(3,102);
+insert into BR values(4,101);
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE or replace function disp_route(bn int) returns void
+as
+$$
+DECLARE
+r1 route%rowtype;
+c1 cursor for select route.* from route,bus,BR 
+		       where route.route_no=BR.route_no
+		       and bus.bus_no=BR.bus_no
+		       and bus_no=bn;
+begin
+open c1;
+loop
+fetch c1 into r1;
+exit when not found;
+raise notice'route no=%',r1.route_no;
+raise notice'source=%',r1.source;
+raise notice'Destination=%',r1.destination;
+raise notice'no of station=%',r1.no_of_station;
+end loop;
+close c1;
+end;
+$$
+language plpgsql;
+
+select disp_route(2);
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+create or replace function disp_bus(start varchar,stop varchar)
+returns void 
+as
+$$
+DECLARE
+r1 bus%rowtype;
+c1 cursor for select bus.* from route,bus,Br
+		       where bus.bus_no=Br.bus_no
+			and route.route_no=BR.route_no
+			and source=start
+			and destination=stop;
+BEGIN
+open c1;
+loop
+fetch c1 into r1;
+exit when not found;
+raise notice'bus no=%',r1.bus_no;
+raise notice'capacity of bus=%',r1.capacity;
+raise notice'Depo name=%',r1.depo_name;
+end loop;
+close c1;
+end;
+$$ 
+language plpgsql;
+
+select disp_bus('shrirampur','pune');

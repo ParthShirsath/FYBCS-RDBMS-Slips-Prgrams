@@ -1,0 +1,76 @@
+create table route(route_no int primary key
+,source varchar(20)
+,destination varchar(20)
+,no_of_station int);
+
+insert into route values(101,'shrirampur','shirdi',4);
+insert into route values(102,'nagar','rahuri',3);
+insert into route values(103,'mumbai','nagpur',40);
+insert into route values(104,'pune','nagpur',34);
+insert into route values(105,'chalisgao','jalgao',5);
+insert into route values(106,'nashik','malegao',6);
+
+select * from route;
+--------------------------------------------------------------------------------------------------------------------------------
+
+create table bus(bus_no int primary key
+,capacity int
+,depot_name varchar(20)
+,route_no int references route(route_no));
+
+insert into bus values(1552,60,'shrirampur',101);
+insert into bus values(4251,50,'rahuri',102);
+insert into bus values(7177,45,'panvel',103);
+insert into bus values(5453,55,'pune',104);
+insert into bus values(8698,58,'pachora',105);
+insert into bus values(2323,53,'nashik',106);
+insert into bus values(2802,38,'shirdi',101);
+
+select * from bus;
+
+-------------------------------------------------------------------------------------------------------------------------------
+create or replace function disp_bus(start varchar,end_point varchar)
+returns void
+as $$
+declare
+r1 bus%rowtype;
+c1 cursor for select bus.* from bus,route where
+				bus.route_no=route.route_no
+				and source=start
+				and destination=end_point;
+begin
+for r1 in c1
+loop
+raise notice'bus number=%',r1.bus_no;
+raise notice'bus capacity=%',r1.capacity;
+raise notice'bus depot name=%',r1.depot_name;
+raise notice'bus route number=%',r1.route_no;
+end loop;
+end;
+$$
+language plpgsql;
+
+select disp_bus('shrirampur','shirdi');
+------------------------------------------------------------------------------------------------------------------------------------------------
+create or replace function bus_detail(depo varchar)
+returns void
+as
+$$
+declare 
+r1 bus%rowtype;
+c1 cursor for select * from bus where depot_name=depo;
+begin
+for r1 in c1
+loop
+raise notice'bus number=%',r1.bus_no;
+raise notice'bus capacity=%',r1.capacity;
+raise notice'bus depot name=%',r1.depot_name;
+raise notice'bus route number=%',r1.route_no;
+end loop;
+end;
+$$
+language plpgsql;
+
+select bus_detail('panvel');
+
+------------------------------------------------------------------------------------------------------------------------------------------------

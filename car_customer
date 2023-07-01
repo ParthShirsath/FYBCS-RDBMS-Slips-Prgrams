@@ -1,0 +1,26 @@
+create table customer(cust_code int primary key,cust_name varchar(20), cust_address text);
+
+
+insert into customer values(1,'Bhausaheb','Shirdi');
+insert into customer values(2,'Parth','Shrirampur');
+insert into customer values(3,'Baburao','Rahuri');
+insert into customer values(4,'Kiran','Shivaji nagar');
+insert into customer values(5,'Sushil','Shivaji nagar');
+
+
+create table car(car_code int primary key,c_name varchar(20),c_price float,color_type varchar(10)
+check(color_type in('Metallic','solid')),cust_code int references customer(cust_code));
+
+
+insert into car values(101,'Rolls royce',70000000,'solid',1);
+insert into car values(101,'Buggati',70000000,'Metallic',1);
+insert into car values(101,'Ferrari',70000000,'solid',1);
+insert into car values(101,'Mercedes',70000000,'Metallic',1);
+insert into car values(101,'BMW',70000000,'solid',1);
+insert into car values(101,'THAR',70000000,'Metallic',1);
+insert into car values(101,'',70000000,'Metallic',1);
+insert into car values(101,'Rolls royce',70000000,'solid',1);
+insert into car values(101,'Rolls royce',70000000,'Metallic',1);
+insert into car values(101,'Rolls royce',70000000,'solid',1);
+insert into car values(101,'Rolls royce',70000000,'solid',1);
+insert into car values(101,'Rolls royce',70000000,'Metallic',1);

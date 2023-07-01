@@ -1,0 +1,74 @@
+create table patient(pno int primary key
+,pname varchar(20)
+,p_addr varchar(20)
+);
+
+create table doctor(dno int primary key
+,dname varchar(20)
+,d_addr varchar(20)
+,city varchar(20)
+);
+
+create table PD(pno int references patient(pno)
+,dno int references doctor(dno)
+,disease varchar(20)
+,no_of_visit int);
+
+insert into patient values(1,'om','pune');
+insert into patient values(2,'sai','mumbai');
+insert into patient values(3,'kumar','nagar');
+
+insert into doctor values(101,'Dr.Jadhav','mumbai','dombivali');
+insert into doctor values(102,'Dr.Patil','pune','pimpri');
+
+insert into PD values(1,101,'dengue',3);
+insert into PD values(2,102,'cold',3);
+insert into PD values(3,102,'diabetes',5);
+insert into PD values(3,101,'maleriya',4);
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+create or replace function count_visit(pn varchar)
+returns int 
+as
+$$
+declare
+cnt int;
+begin
+select sum(no_of_visit) into cnt from pd,patient
+where patient.pno=pd.pno
+and pname=pn;
+return cnt;
+end;
+$$
+language plpgsql;
+
+select count_visit('kumar');
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+create or replace function disp_patient(dn varchar)
+returns void
+as
+$$
+DECLARE
+r1 patient%rowtype;
+c1 cursor for select patient.* from patient,doctor,pd 
+where patient.pno=pd.pno
+and doctor.dno=pd.dno
+and no_of_visit>3
+and disease='diabetes'
+and dname=dn;
+BEGIN
+open c1;
+loop
+fetch c1 into r1;
+exit when not found;
+raise notice'patient no=%',r1.pno;
+raise notice'patient name=%',r1.pname;
+raise notice'patient address=%',r1.p_addr;
+end loop;
+close c1;
+end;
+$$
+language plpgsql;
+
+select disp_patient('Dr.Patil');
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
