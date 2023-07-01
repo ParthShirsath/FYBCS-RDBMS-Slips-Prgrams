@@ -1,0 +1,44 @@
+create table student(rno int primary key,
+sname varchar(20));
+
+create table teacher(tno int primary key,
+tname varchar(20),
+qualification varchar(20));
+
+create table s_t(rno int references student(rno),
+tno int references teacher(tno),
+subject varchar(20));
+
+insert into student values(1,'om');
+insert into student values(2,'sai');
+insert into student values(3,'ram');
+insert into student values(4,'sham');
+
+insert into teacher values(101,'mr.joshi');
+insert into teacher values(102,'mr.navle');
+insert into teacher values(103,'mrs.patil');
+
+insert into s_t values(1,101,'DS');
+insert into s_t values(1,102,'RDBMS');
+insert into s_t values(1,103,'C');
+insert into s_t values(2,101,'DS');
+insert into s_t values(2,103,'RDBMS');
+insert into s_t values(2,103,'M1');
+insert into s_t values(3,101,'DS');
+insert into s_t values(3,101,'DBMS');
+insert into s_t values(3,103,'C++');
+
+do $$
+declare
+r1 student%rowtype;
+c1 cursor for select student.* from student,teacher,s_t where 
+student.rno=s_t.rno and
+teacher.tno=s_t.tno and 
+subject='RDBMS';
+begin
+for r1 in c1 
+loop
+raise notice 'student roll no=%',r1.rno;
+raise notice 'student name=%',r1.sname;
+end loop;
+end $$;

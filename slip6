@@ -1,0 +1,73 @@
+create table movie(m_name varchar(30) primary key,
+release_year integer,
+budget money);
+
+create table producer(p_id int primary key,
+pname varchar(30),
+p_address varchar(30));
+
+create table m_p(m_name varchar(30) references movie,
+p_id int references producer);
+
+insert into movie values('Tanhaji',2019,1250000000);
+insert into movie values('Sher Shivraj',2022,40000000);
+insert into movie values('Drishyam 2',2022,800000000);
+insert into movie values('Singham Returns',2018,700000000);
+insert into movie values('Pavankhind',2022,20000000);
+
+insert into producer values(1,'Ajay Devgan','Mumbai');
+insert into producer values(2,'Bhaushaheb arekar','Pune');
+insert into producer values(3,'Nitin Keni','Gujrat');
+insert into producer values(4,'Bhushan kumar','Pune');
+
+insert into M_p values('Tanhaji',1);
+insert into M_p values('Sher Shivraj',3);
+insert into M_p values('Drishyam 2',4);
+insert into M_p values('Singham Returns',1);
+insert into M_p values('Pavankhind',2);
+insert into M_p values('Drishyam 2',1);
+insert into M_p values('Sher Shivraj',2);
+
+select * from movie;
+
+select * from producer;
+
+select * from M_p;
+-------------------------------------------------------------------------------------------------------------
+create function disp_movie(name varchar) returns int as
+$$
+declare
+cnt int;
+begin
+select count (*) into cnt from movie,producer,M_p 
+where movie.m_name=M_p.m_name
+and producer.p_id=M_p.p_id
+and m_name=name;
+return cnt;
+end;
+$$
+language plpgsql;
+
+select disp_movie('Tanhaji');
+-------------------------------------------------------------------------------------------------------------
+create function disp_producer(m_name1 text)returns void as
+$$
+DECLARE
+name varchar;
+c1 cursor for select pname from movie,producer,M_p
+where movie.m_name=M_p.m_name
+and producer.p_id=M_p.p_id
+and movie.m_name=m_name1;
+BEGIN
+open c1;
+loop
+fetch c1 into name;
+exit when not found;
+raise notice'producer name=%',name;
+end loop;
+close c1;
+END;
+$$
+language plpgsql;
+
+select  disp_producer('Drishyam 2');

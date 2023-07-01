@@ -1,0 +1,33 @@
+create table project(pno int primary key,
+pname varchar(20),
+ptype varchar(20),
+duration int);
+
+create table employee(eno int primary key,
+ename varchar(20),
+qualification varchar(20),
+joindate date);
+
+
+create table PE(pno int references project,
+eno int references employee,
+startdate date,
+hours int);
+ 
+insert into project values(101,'Electronics','Educational',3);
+insert into project values(102,'System','Industrial',5);
+insert into project values(103,'Robotics','Industrial',4);
+ 
+insert into employee values(1,'Danish','BE.Mech','2011-11-21');
+insert into employee values(2,'Satish','BE.Mech','2010-01-01');
+insert into employee values(3,'Amol','BCS','2012-06-01');
+insert into employee values(4,'Amit','BCS','2013-02-01');
+insert into employee values(5,'Nitin','MCS','2012-08-01');
+
+insert into PE values(101,1,'2014-01-21',10);
+insert into PE values(101,2,'2014-01-21',10);
+insert into PE values(101,3,'2013-11-11',15);
+insert into PE values(102,3,'2013-11-11',15);
+insert into PE values(102,4,'2014-05-11',35);
+insert into PE values(103,1,'2014-05-11',15);
+insert into PE values(103,5,'2014-05-11',25);

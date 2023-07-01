@@ -1,0 +1,100 @@
+create table customer(cno int primary key,cname varchar(30),
+city varchar(30));
+
+create table account(ano int primary key,atype varchar(25),
+opening_date date,balance money,cno int references customer);
+
+
+insert into customer values(1,'om','pune');
+insert into customer values(2,'sai','sambhajinagar');
+insert into customer values(3,'ram','shrirampur');
+insert into customer values(4,'sham','mumbai');
+insert into customer values(5,'aman','pune');
+insert into customer values(6,'om','rahuri');
+
+
+insert into account values(101,'current','2008-2-29',40000,1);
+insert into account values(102,'saving','2008-4-29',320000,1);
+insert into account values(103,'saving','2010-8-29',450000,2);
+insert into account values(104,'current','2011-12-29',3000,3);
+insert into account values(105,'saving','2012-9-29',203000,4);
+insert into account values(106,'current','2014-10-29',6000,5);
+insert into account values(107,'saving','2015-7-24',800000,6);
+
+
+create or replace function disp_acct(no int)returns void as
+$$
+declare
+r1 account%rowtype;
+begin
+select * into r1 from account where ano=no;
+raise notice'account no=%',r1.ano;
+raise notice'account type=%',r1.atype;
+raise notice'account opening date=%',r1.opening_date;
+raise notice'account balance=%',r1.balance;
+end;
+$$
+language plpgsql;
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+create function disp_cust(name text) returns void
+AS
+$$
+declare
+r1 account%rowtype;
+c1 cursor for select ano,atype,opening_date,balance from 
+customer,account where account.cno=customer.cno and cname=name;
+begin
+if name!= then
+raise exception 'invalid name';
+else
+open c1;
+loop
+fetch c1 into r1;
+exit when not found;
+raise notice'account no=%',r1.ano;
+raise notice'account type=%',r1.atype;
+raise notice'account opening date=%',r1.opening_date;
+raise notice'account balance=%',r1.balance;
+end loop;
+close c1;
+end if;
+end;
+$$
+language plpgsql;
+
+select disp_cust('om');
+
+
+---------------------------------------------------------------------------------------------------------------------------
+create or replace function disp_account(date date) returns int as
+$$
+DECLARE
+cnt int;
+BEGIN
+select count(*) into cnt from account where opening_date<=date;
+return cnt;
+END;
+$$
+LANGUAGE PLPGSQL;
+
+----------------------------------------------------------------------------------------------------------------------------
+create or replace function disp_acct(cy text) returns void
+AS
+$$
+declare
+c1 cursor for select * from account,customer where 
+account.cno=customer.cno and
+city=cy;
+begin
+open c1;
+loop
+fetch c1 into r1;
+exit when not found;
+raise notice'account type=%',r1.atype;
+raise notice'account opening date=%',r1.opening_date;
+raise notice'account balance=%',r1.balance;
+end loop;
+close c1;
+end;
+$$
+language plpgsql;

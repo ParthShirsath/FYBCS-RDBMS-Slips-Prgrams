@@ -1,0 +1,21 @@
+create function disp_cust1(name text) returns void
+AS
+$$
+declare
+r1 account%rowtype;
+c1 cursor for select ano,atype,opening_date,balance from 
+customer,account where account.cno=customer.cno and cname=name;
+begin
+for r1 in c1
+loop
+raise notice'account no=%',r1.ano;
+raise notice'account type=%',r1.atype;
+raise notice'account opening date=%',r1.opening_date;
+raise notice'account balance=%',r1.balance;
+end loop;
+exception
+when no_data_found then
+raise exception 'invalid customer name';
+end;
+$$
+language plpgsql;

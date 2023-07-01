@@ -1,0 +1,41 @@
+create table department(dno int primary key,
+dname varchar(20),
+city varchar(20));
+
+create table employee(eno int primary key,
+ename varchar(20),
+salary float,
+dno int references department);
+
+insert into department values(101,'computer','shrirampur');
+insert into department values(102,'account','pune');
+insert into department values(103,'mechanical','mumbai');
+insert into department values(104,'IT','mumbai');
+
+insert into employee values(1,'parth',30000,101);
+insert into employee values(2,'om',25000,101);
+insert into employee values(3,'omkar',32000,101);
+insert into employee values(4,'rahul',40000,102);
+insert into employee values(5,'ram',50000,102);
+insert into employee values(6,'bhausaheb',60000,103);
+insert into employee values(7,'vinod',12000,103);
+insert into employee values(8,'om',39000,104);
+
+select * from department;
+
+select * from employee;
+
+create or replace function disp_avg(dep varchar) returns float
+AS
+$$
+declare
+ans float;
+begin
+select avg(salary) into ans from department,employee where department.dno=employee.dno and dname=dep;
+return ans;
+end;
+$$
+language plpgsql;
+
+select disp_avg('computer');
+

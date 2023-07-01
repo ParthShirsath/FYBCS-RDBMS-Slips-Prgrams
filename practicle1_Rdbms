@@ -1,0 +1,72 @@
+create or replace function add(in a int,in b int)
+returns void as $$
+DECLARE
+c int;
+p int;
+BEGIN
+c=a+b;
+raise notice'addition=%',c;
+p=a*b;
+raise notice'multiplication=%',p;
+END;
+$$
+LANGUAGE PLPGSQL;
+
+select add(10,20);
+----------------------------------------------------------------------------------------------------------
+create or replace function division (in a int,in b int)
+returns void as $$
+declare
+c float;
+begin
+c=a/b;
+if b=0 then
+raise exeption'zero division is not allow';
+else
+raise notice'division=%',c;
+end if;
+end;
+$$
+language plpgsql;
+
+select division(10,5);
+select division(10,0);
+----------------------------------------------------------------------------------------------------------
+create table employee(eno int,ename varchar(20),dept varchar(20),
+sal int);
+create or replace function insert_values(no int,name varchar,dp varchar,salary int)
+returns void as $$
+begin
+insert into employee values(no,name,dp,salary);
+raise notice 'Record inserted Successfully....';
+end;
+$$
+language plpgsql;
+
+select insert_values(1,'om','computer',20000);
+select insert_values(2,'sai','computer',60000);
+select insert_values(3,'ram','Account',50000);
+
+----------------------------------------------------------------------------------------------------------
+create or replace function disp_emp(dp varchar)
+returns void as $$
+declare
+r1 employee%rowtype;
+c1 cursor for select * from employee where dept=dp;
+begin
+open c1;
+loop
+fetch c1 into r1;
+exit when not found;
+raise notice'Employee no=%',r1.eno;
+raise notice'Employee name=%',r1.ename;
+raise notice'Employee department=%',r1.dept;
+raise notice'Employee salary=%',r1.sal;
+end loop;
+close c1;
+end;
+$$
+language plpgsql;
+
+
+select disp_emp('computer');
