@@ -1,0 +1,72 @@
+create table area(aid int primary key,
+aname text,
+a_type varchar(5) check(a_type in('rural','urban')));
+
+create table person(pno int primary key,
+pname text,
+bdate date,
+income int,
+aid int references area);
+
+insert into area values(1,'Pune','urban');
+insert into area values(2,'belapur','rural');
+insert into area values(3,'Shrirampur','urban');
+insert into area values(4,'astagao','rural');
+
+
+insert into person values(101,'om','2005-07-23',50000,1);
+insert into person values(102,'sai','2004-08-23',45000,1);
+insert into person values(103,'ram','2003-02-23',25000,2);
+insert into person values(104,'sham','2002-09-23',15000,3);
+insert into person values(105,'aman','2006-01-23',75000,4);
+insert into person values(106,'aba','2007-11-23',88000,4);
+insert into person values(107,'baba','2001-07-23',100000,3);
+
+
+do
+$$
+declare
+r1 record;
+c1 cursor for select aname,pname from person,area
+where area.aid=person.aid
+and a_type='urban';
+begin
+open c1;
+loop
+fetch c1 into r1;
+exit when not found;
+raise notice'area =%  person name=%',r1.aname,r1.pname;
+end loop;
+close c1;
+end $$;
+
+
+
+do
+$$
+declare
+r1 record;
+r1 record;
+c1 cursor for select aname from area;
+c2 cursor(aname1 varchar) for select pname from person,area
+where area.aid=person.aid
+and aname=aname1;
+begin
+open c1;
+loop
+fetch c1 into r1;
+exit when not found;
+raise notice'--------------------------';
+raise notice'area name=%',r1.aname;
+	open c2(r2.aname);
+	loop
+	fetch c2 into r2; 
+	exit when not found;
+	raise notice'person name=%',r2.pname;
+	end loop;
+	close c2;
+end loop;
+close c1;
+end $$;
+
+select * from person where extract(month from bdate)=1;

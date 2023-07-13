@@ -1,0 +1,92 @@
+create table branch(bid int primary key,
+branch varchar(30),
+br_city varchar(30));
+
+create table customer(cno int primary key,
+cname varchar(30),
+caddr char(30),
+city varchar(20));
+
+create table loan_app(lno int primary key,
+l_amt_required money,
+l_amt_approved money,
+l_date date);
+
+create table bcl(bid int references branch,
+cno int references customer,
+lno int references loan_app);
+
+insert into branch values(101,'MG Road','Pune');
+insert into branch values(102,'Shivaji Road','Shrirampur');
+insert into branch values(103,'Newasa Road','Shrirampur');
+
+insert into customer values(201,'om','Pune','Pune');
+insert into customer values(202,'sai','Pune','Pune');
+insert into customer values(203,'ram','Shrirampur','Shrirampur');
+insert into customer values(204,'sham','Nashik','Nashik');
+insert into customer values(205,'aman','Mumbai','Mumbai');
+
+
+insert into loan_app values(301,5000,6000,'2000-01-12');
+insert into loan_app values(302,7000,5000,'2001-01-13');
+insert into loan_app values(303,8000,7000,'2003-03-14');
+insert into loan_app values(304,9000,9000,'2003-07-15');
+insert into loan_app values(305,12000,12000,'2005-07-20');
+
+insert into bcl values(101,201,301);
+insert into bcl values(102,201,302);
+insert into bcl values(102,201,303);
+insert into bcl values(103,203,304);
+insert into bcl values(103,203,305);
+
+
+create or replace function disp_cust(name varchar) returns int
+AS $$
+declare
+cnt int;
+begin
+select count(*) into cnt from customer,bcl,loan_app,branch
+where branch.bid=bcl.bid
+and loan_app.lno=bcl.lno
+and customer.cno=bcl.cno
+and branch=name;
+return cnt; 
+end;
+$$
+language plpgsql;
+--calling
+select disp_cust('MG Road');
+
+
+create function max_amt() returns money as
+$$
+declare
+maximum money;
+begin
+select max(l_amt_approved) into maximum from loan_app,bcl
+where loan_app.lno=bcl.lno;
+return maximum;
+end;
+$$
+language plpgsql;
+--calling
+select max_amt();
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+create function disp_amt(amt money) returns int as
+$$
+declare
+cnt int;
+begin
+select count(*) into cnt from loan_app,branch,customer,bcl
+where branch.bid=bcl.bid
+and loan_app.lno=bcl.lno
+and customer.cno=bcl.cno
+and l_amt_required>=amt;
+return cnt; 
+end;
+$$
+language plpgsql;
+--calling
+select disp_amt('$7000.00');

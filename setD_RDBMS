@@ -1,0 +1,74 @@
+create table student(s_reg_no int primary key,
+s_name varchar(30),
+s_class varchar(10));
+
+create table competition(comp_no int primary key,
+comp_name varchar(20),
+comp_type varchar(20));
+
+create table sc(s_reg_no int references student,
+comp_no int references competition,
+rank_of_stud varchar(20),
+year int);
+
+
+insert into student values(1,'om','fybcs');
+insert into student values(2,'sai','sybcs');
+insert into student values(3,'ram','tybcs');
+insert into student values(4,'sham','tybcs');
+
+insert into competition values(101,'dancing','national');
+insert into competition values(102,'drawing','national');
+insert into competition values(103,'music','state');
+
+insert into sc values(1,101,'I',2022);
+insert into sc values(1,102,'III',2021);
+insert into sc values(1,103,'I',2021);
+insert into sc values(2,101,'I',2022);
+insert into sc values(2,102,'I',2022);
+insert into sc values(3,101,'III',2021);
+insert into sc values(4,103,'II',2022);
+
+
+select year,comp_name from competition,sc
+where competition.comp_no=sc.comp_no
+order by year;
+
+do
+$$
+declare
+r1 
+c1 cursor for select year,comp_name from competition,sc
+where competition.comp_no=sc.comp_no
+order by year;
+begin
+select year,comp_name into yer,cmp_name from competition,sc
+where competition.comp_no=sc.comp_no;
+open c1;
+loop
+fetch c1 into cmp_name,yer;
+exit when not found;
+raise notice'compitition name=%',cmp_name;
+raise notice'compitition year=%',yer;
+end loop;
+close c1;
+end $$;
+
+
+
+select s_name,count(*) from student,competition,sc
+where student.s_reg_no=sc.s_reg_no
+and competition.comp_no=sc.comp_no
+group by s_name;
+
+
+do
+$$
+declare
+c1 cursor for select s_name,count(*) from student,competition,sc
+where student.s_reg_no=sc.s_reg_no
+and competition.comp_no=sc.comp_no
+group by s_name;
+begin
+
+end $$;

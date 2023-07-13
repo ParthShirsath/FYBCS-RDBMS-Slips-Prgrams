@@ -1,0 +1,161 @@
+create or replace function min_max(in a int,in b int)
+returns void as $$
+begin
+if a>b then
+raise info'maximum number=%',a;
+else
+raise info'maximum number=%',b;
+end if;
+if a<b then
+raise info'minimum number=%',a;
+else
+raise info'minimum number=%',b;
+end if;
+end;
+$$
+language plpgsql;
+
+select min_max(10,20);
+-----------------------------------------------------------------------------------------------------------------------
+create or replace function check_num(n int)
+returns void as $$
+begin
+if n>0 then 
+raise notice 'number is positive';
+else if n<0 then 
+raise notice 'number is negative';
+else 
+raise notice 'number is zero';
+end if;
+end if;
+end;
+$$
+language plpgsql;
+
+select check_num(4);
+select check_num(0);
+select check_num(-4);
+
+-----------------------------------------------------------------------------------------------------------------------
+
+create or replace function min_max(in a int,in b int,in c int) 
+returns void 
+as
+$$
+begin
+if a>b and a>c then 
+raise notice'maximum number=%',a;
+else if b>a and b>c
+raise notice'maximum number=%',b;
+else
+raise notice'maximum number=%',c;
+end if;
+end if;
+
+if (a<b and a<c) then 
+raise notice'minimum number=%',a;
+else if (b<a and b<c)
+raise notice'minimum number=%',b;
+else
+raise notice'minimum number=%',c;
+end if;
+end if;
+end;
+$$
+language plpgsql;
+----------------------------------------------------------------------------------------------------------------------
+create or replace function even_odd(n int)
+returns void as $$
+begin if n%2=0 then 
+raise notice'number is even';
+else
+raise notice'number is even';
+end if;
+end;
+$$
+language plpgsql;
+-----------------------------------------------------------------------------------------------------------------------
+do $$
+declare 
+s int=0;
+d int;
+i int;
+begin
+for i in 1..10 
+loop
+s=s+i;
+end loop;
+raise notice'sum=%',s;
+end $$;
+-----------------------------------------------------------------------------------------------------------------------
+do $$
+declare
+i int;
+begin
+for i in 1..50
+loop
+if i%2!=0 then
+raise notice'%',i;
+end if;
+end loop;
+end $$;
+-----------------------------------------------------------------------------------------------------------------------
+create or replace function sum_avg(n int)
+returns void 
+as
+$$
+declare
+s int=0;
+a float;
+i int=1;
+begin
+while (i<=n)
+loop
+s=s+i;
+i=i+1;
+end loop;
+raise notice'sum=%',s;
+a=s/n;
+raise notice'average=%',a;
+end;
+$$
+language plpgsql;
+
+select sum_avg(10);
+-----------------------------------------------------------------------------------------------------------------------
+create or replace function count_even(m int,n int)
+returns void 
+as
+$$
+declare
+i int;
+begin
+while(i>=m and i<=n)
+loop
+if i%2=0
+raise notice'%',i;
+end if;
+end loop;
+end;
+$$
+language plpgsql;
+-----------------------------------------------------------------------------------------------------------------------
+create or replace function display_num(n int)
+returns void 
+as
+$$
+begin
+case n;
+when 1 then raise notice'one';
+when 2 then raise notice'two';
+when 3 then raise notice'three';
+when 4then raise notice'four';
+when 5then raise notice'five';
+when 6 then raise notice'six';
+when 7 then raise notice'seven';
+when 8 then raise notice'eight';
+when 9 then raise notice'nine';
+when 0 then raise notice'zero';
+end;
+$$
+language plpgsql;
